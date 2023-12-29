@@ -2,81 +2,37 @@
 
 namespace ECSLite
 {
-    public class ContextT<TEntity, IContext> : Context where TEntity : struct
+    public class ContextT<IContext> : Context
     {
-        private readonly Func<EntityIdentify, TEntity> CreateEntityFunc;
-        public ContextT(int componentCount, int staticComponentCount, Func<EntityIdentify, TEntity> createEntityFunc) : base(componentCount, staticComponentCount)
+        protected IStaticComponent[] staticComponents;
+        public ContextT(int componentCount, int uniqueCount, int staticComponentCount) : base(componentCount, uniqueCount)
         {
-            CreateEntityFunc = createEntityFunc;
+            staticComponents = new IStaticComponent[staticComponentCount];
         }
 
-        public TEntity Create()
+        public Entity<IContext> Create()
         {
-            var id = CreateEntity();
-            return CreateEntityFunc(id);
+            var e = CreateEntity();
+            return new Entity<IContext> { entity = e, ID = e.ID  };
         }
 
-        public T AddComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
+        internal Entity<IContext> IndexToEntity(int index)
         {
-            var entity = entities[id.Index];
-            if (entity.ID.Version != id.Version)
-            {
-                return null;
-            }
-            int componentId = ComponentIdentity<T>.Id;
-            var collector = collectors[componentId] as IComponentCollectorT<T>;
-            var component = collector.Add(id) as T;
-            if (!ComponentIdentity<T>.Unique)
-                entity.AddComponent(componentId);
-            return component;
+            var e = Get(index);
+            if (e == null)
+                return default;
+            return new Entity<IContext> { entity = e, ID = e.ID };
         }
+
         public T AddStaticComponent<T>() where T : class, IContext, IStaticComponent, new()
         {
             int id = StaticComponentIdentity<T>.Id;
-            var component = staticComponents[id] as T;
+            T component = staticComponents[id] as T;
             if (component == null)
             {
                 component = new T();
                 staticComponents[id] = component;
             }
-            return component;
-        }
-
-        public bool HasComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
-        {
-            var entity = entities[id.Index];
-            if (entity.ID.Version != id.Version)
-            {
-                return false;
-            }
-            if (!ComponentIdentity<T>.Unique)
-                return entity.HasComponent(ComponentIdentity<T>.Id);
-            return collectors[ComponentIdentity<T>.Id].Get(id) != null;
-        }
-
-        public T GetComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
-        {
-            var entity = entities[id.Index];
-            if (entity.ID.Version != id.Version)
-            {
-                return null;
-            }
-            int componentId = ComponentIdentity<T>.Id;
-            if (!ComponentIdentity<T>.Unique && !entity.HasComponent(componentId))
-                return null;
-            return collectors[componentId].Get(id) as T;
-        }
-        public T GetUniqueComponent<T>(out TEntity entity) where T : class, IContext, IUniqueComponent, new()
-        {
-            if (!ComponentIdentity<T>.Unique)
-            {
-                throw new Exception($"{typeof(T).Name} not a UniqueComponent");
-            }
-            int id = ComponentIdentity<T>.Id;
-            var collector = collectors[id] as UniqueComponentCollector<T>;
-            
-            var component = collector.TryGet(out EntityIdentify entityId);
-            entity = CreateEntityFunc(entityId);
             return component;
         }
 
@@ -86,24 +42,21 @@ namespace ECSLite
             return staticComponents[id] as T;
         }
 
-        public void RemoveComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
+        public T GetUniqueComponent<T>(out Entity<IContext> entity) where T : class, IContext, IUniqueComponent, new()
         {
-            var entity = entities[id.Index];
-            if (entity.ID.Version != id.Version)
+            var component = GetUniqueComponent<T>(out EntityInternal e);
+            if (component == null)
             {
-                throw new Exception($"Entity已经被删除 => {id}");
+                entity = default;
+                return null;
             }
-            int componentId = ComponentIdentity<T>.Id;
-            if (!entity.HasComponent(componentId))
-                return;
-            collectors[ComponentIdentity<T>.Id].Remove(id);
-            if (!ComponentIdentity<T>.Unique)
-                entity.RemoveComponent(componentId);
+            entity = new Entity<IContext> { entity = e, ID = e.ID };
+            return component;
         }
 
-        public void RemoveAll<T>() where T : class, IContext, IComponent, new()
+        public void RemoveComponentAll<T>() where T : class, IContext, IComponent, new()
         {
-            collectors[ComponentIdentity<T>.Id].RemoveAll();
+            RemoveAll<T>();
         }
 
         public void AddToAllEntity<T>() where T : class, IContext, IComponent, new()
@@ -111,22 +64,20 @@ namespace ECSLite
             AddToAll<T>();
         }
 
-        public EntityFindResult<TEntity, T> Find<T>(int startIndex, Func<T, bool> condition = null) where T: class, IContext, IComponent, new ()
+        public EntityFindResult<IContext, T> Find<T>(int startIndex, Func<T, bool> condition = null) where T: class, IContext, IComponent, new ()
         {
-            int id = ComponentIdentity<T>.Id;
-            var collector = collectors[id] as IComponentCollectorT<T>;
-            var result = collector.Find(startIndex, condition);
-            return new EntityFindResult<TEntity, T>
+            var result =FindComponet(startIndex, condition);
+            return new EntityFindResult<IContext, T>
             {
                 Component = result.Component,
-                Entity = CreateEntityFunc(result.EntityID),
+                Entity = IndexToEntity(result.EntityIndex),
                 Index = result.Index,
             };
         }
 
-        public Group<TEntity, IContext, T> CreateGroup<T>(Func<T, bool> condition = null) where T : class, IContext, IComponent, new()
+        public Group<IContext, T> CreateGroup<T>(Func<T, bool> condition = null) where T : class, IContext, IComponent, new()
         {
-            return new Group<TEntity, IContext, T>(this, condition);
+            return new Group<IContext, T>(this, condition);
         }
     }
 }

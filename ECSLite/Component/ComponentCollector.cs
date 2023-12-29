@@ -22,16 +22,16 @@ namespace ECSLite
             return unit;
         }
 
-        public IComponent Add(EntityIdentify entityID)
+        public IComponent Add(int entityIdx)
         {
-            if (mIdIdxMap.TryGetValue(entityID.Index, out int idx))
+            if (mIdIdxMap.TryGetValue(entityIdx, out int idx))
             {
                 var exist = mUnits[idx];
                 return exist.Component;
             }
             var unit = Create();
-            mIdIdxMap.Add(entityID.Index, unit.Index);
-            unit.Owner = entityID;
+            mIdIdxMap.Add(entityIdx, unit.Index);
+            unit.EntityIdx = entityIdx;
             return unit.Component;
         }
 
@@ -40,13 +40,13 @@ namespace ECSLite
             for (int i = startIndex; i < mUnits.Count; ++i)
             {
                 var unit = mUnits[i];
-                if (!unit.Owner.Valid)
+                if (unit.EntityIdx < 0)
                     continue;
                 if (condition == null || condition(unit.Component))
                 {
                     return new ComponentFindResult<T>()
                     {
-                        EntityID = unit.Owner,
+                        EntityIndex = unit.EntityIdx,
                         Index = i + 1,
                         Component = unit.Component
                     };
@@ -55,23 +55,23 @@ namespace ECSLite
             return default;
         }
 
-        public IComponent Get(EntityIdentify entityID)
+        public IComponent Get(int entityIdx)
         {
-            if (mIdIdxMap.TryGetValue(entityID.Index, out int idx))
+            if (mIdIdxMap.TryGetValue(entityIdx, out int idx))
             {
                 return mUnits[idx].Component;
             }
             return null;
         }
 
-        public void Remove(EntityIdentify entityID)
+        public void Remove(int entityIdx)
         {
-            if (mIdIdxMap.TryGetValue(entityID.Index, out int idx))
+            if (mIdIdxMap.TryGetValue(entityIdx, out int idx))
             {
                 var unit = mUnits[idx];
                 unit.Reset();
                 mUnUsedIdxs.Enqueue(idx);
-                mIdIdxMap.Remove(entityID.Index);
+                mIdIdxMap.Remove(entityIdx);
             }
         }
 

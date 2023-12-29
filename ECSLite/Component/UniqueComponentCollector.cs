@@ -5,11 +5,11 @@ namespace ECSLite
     internal class UniqueComponentCollector<T> : IComponentCollectorT<T> where T : class, IUniqueComponent, new()
     {
         private readonly ComponentEntity<T> Component = new ComponentEntity<T>();
-        public int Count => Component.Owner.Valid ? 1 : 0;
+        public int Count => Component.EntityIdx >= 0 ? 1 : 0;
 
-        public IComponent Add(EntityIdentify entityID)
+        public IComponent Add(int entityID)
         {
-            if (Component.Owner == entityID)
+            if (Component.EntityIdx == entityID)
             {
                 return Component.Component;
             }
@@ -17,13 +17,13 @@ namespace ECSLite
             {
                 Remove(entityID);
             }
-            Component.Owner = entityID;
+            Component.EntityIdx = entityID;
             return Component.Component;
         }
-        public T TryGet(out EntityIdentify id)
+        public T TryGet(out int entityIdx)
         {
-            id = Component.Owner;
-            if (id.Valid)
+            entityIdx = Component.EntityIdx;
+            if (Component.EntityIdx < 0)
                 return null;
             return Component.Component;
         }
@@ -32,25 +32,26 @@ namespace ECSLite
         {
             var result = new ComponentFindResult<T>();
             if (startIndex == 0
-                && Component.Owner.Valid && (condition == null || condition(Component.Component)))
+                && Component.EntityIdx >= 0 
+                && (condition == null || condition(Component.Component)))
             {
                 result.Component = Component.Component;
                 result.Index = 1;
-                result.EntityID = Component.Owner;
+                result.EntityIndex = Component.EntityIdx;
             }
             return result;
         }
 
-        public IComponent Get(EntityIdentify entityID)
+        public IComponent Get(int entityIdx)
         {
-            if (entityID == Component.Owner)
+            if (entityIdx == Component.EntityIdx)
                 return Component.Component;
             return null;
         }
 
-        public void Remove(EntityIdentify entityID)
+        public void Remove(int entityIdx)
         {
-            if (entityID == Component.Owner)
+            if (entityIdx == Component.EntityIdx)
             {
                 Component.Reset();
             }
@@ -58,7 +59,7 @@ namespace ECSLite
 
         public void RemoveAll()
         {
-            if (Component.Owner.Valid)
+            if (Component.EntityIdx >= 0)
             {
                 Component.Reset();
             }

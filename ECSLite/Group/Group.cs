@@ -1,14 +1,14 @@
 ﻿namespace ECSLite
 {
-    public struct Group<TEntity, IContext, TComponent> where TComponent : class, IContext, IComponent, new() where TEntity : struct
+    public struct Group<IContext, TComponent> where TComponent : class, IContext, IComponent, new()
     {
-        private ContextT<TEntity, IContext> context;
+        private ContextT<IContext> context;
         private int index;
         private System.Func<TComponent, bool> condition;
-        public TEntity Entity;
+        public Entity<IContext> Entity;
         public TComponent Component;
 
-        public Group(ContextT<TEntity, IContext> context, System.Func<TComponent, bool> condition)
+        public Group(ContextT<IContext> context, System.Func<TComponent, bool> condition)
         {
             index = 0;
             this.context = context;

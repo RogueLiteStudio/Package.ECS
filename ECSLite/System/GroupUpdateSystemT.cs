@@ -1,8 +1,7 @@
 ﻿namespace ECSLite
 {
-    public abstract class GroupUpdateSystemT<ContextType, TEntity, IContext, TComponent> :ISystem 
-        where ContextType : ContextT<TEntity, IContext>, new()
-        where TEntity : struct
+    public abstract class GroupUpdateSystemT<ContextType, IContext, TComponent> :ISystem 
+        where ContextType : ContextT<IContext>, new()
         where TComponent : class, IContext, IComponent, new()
     {
         public ContextType Context { get; private set; }
@@ -25,6 +24,6 @@
         }
         protected virtual void OnStartUpdate() { }
         protected virtual void OnFinishUpdate() { }
-        protected abstract void OnExecuteEntity(TEntity entity, TComponent component);
+        protected abstract void OnExecuteEntity(Entity<IContext> entity, TComponent component);
     }
 }

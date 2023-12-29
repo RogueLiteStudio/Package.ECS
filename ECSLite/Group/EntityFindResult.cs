@@ -1,15 +1,15 @@
 ﻿namespace ECSLite
 {
-    public struct ComponentFindResult<TComponent> where TComponent : IComponent
+    internal struct ComponentFindResult<TComponent> where TComponent : IComponent
     {
-        public EntityIdentify EntityID;
+        public int EntityIndex;
         public int Index;
         public TComponent Component;
     }
 
-    public struct EntityFindResult<TEntity, TComponent> where TComponent : IComponent
+    public struct EntityFindResult<IContext, TComponent> where TComponent : IComponent
     {
-        public TEntity Entity;
+        public Entity<IContext> Entity;
         public int Index;
         public TComponent Component;
     }

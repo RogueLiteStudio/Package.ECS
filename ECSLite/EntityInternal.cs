@@ -2,25 +2,46 @@
 
 namespace ECSLite
 {
-    public class EntityInternal
+    internal class EntityInternal
     {
         public EntityIdentify ID;
-        public BitArray ComponentFlag;
         public bool Used;
+        public Context Owner;
+        public BitArray ComponentFlag;
 
-        public bool HasComponent(int index)
+        public T AddComponent<T>() where T : class, IComponent, new()
         {
-            return ComponentFlag[index];
+            var component = Owner.AddComponent<T>(ID.Index);
+            if (!ComponentIdentity<T>.Unique)
+                ComponentFlag[ComponentIdentity<T>.Id] = true;
+            return component;
         }
 
-        public void AddComponent(int index)
+        public T GetComponent<T>() where T : class, IComponent, new()
         {
-            ComponentFlag[index] = true;
+            int componentId = ComponentIdentity<T>.Id;
+            if (ComponentFlag[componentId])
+            {
+                return Owner.GetComponent<T>(ID.Index) as T;
+            }
+            return null;
         }
 
-        public void RemoveComponent(int index)
+        public bool HasComponent<T>() where T : class, IComponent, new()
         {
-            ComponentFlag[index] = false;
+            if (!ComponentIdentity<T>.Unique)
+                return ComponentFlag[ComponentIdentity<T>.Id];
+            return Owner.GetComponent<T>(ID.Index) != null;
+        }
+
+        public void RemoveComponent<T>() where T : class, IComponent, new()
+        {
+            int componentId = ComponentIdentity<T>.Id;
+            if (ComponentFlag[componentId])
+            {
+                Owner.RemoveComponent<T>(ID.Index);
+                ComponentFlag[componentId] = false;
+            }
         }
 
         public void Clear()
