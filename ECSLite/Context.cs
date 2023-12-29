@@ -96,10 +96,16 @@ namespace ECSLite
 
         protected void AddToAll<T>() where T : class, IComponent, new()
         {
-            var collector = collectors[ComponentIdentity<T>.Id];
+            int componentId = ComponentIdentity<T>.Id;
+            var collector = collectors[componentId];
             for (int i=0; i<entities.Count; ++i)
             {
-                collector.Add(entities[i].ID);
+                var entity = entities[i];
+                var component = collector.Add(entity.ID) as T;
+                if (component != null)
+                {
+                    entity.AddComponent(componentId);
+                }
             }
         }
     }

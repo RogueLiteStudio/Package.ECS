@@ -21,10 +21,14 @@ namespace ECSLite
             var entity = entities[id.Index];
             if (entity.ID.Version != id.Version)
             {
-                throw new Exception($"Entity已经被删除 => {id}");
+                return null;
             }
-            var collector = collectors[ComponentIdentity<T>.Id] as IComponentCollectorT<T>;
-            return collector.Add(id) as T;
+            int componentId = ComponentIdentity<T>.Id;
+            var collector = collectors[componentId] as IComponentCollectorT<T>;
+            var component = collector.Add(id) as T;
+            if (!ComponentIdentity<T>.Unique)
+                entity.AddComponent(componentId);
+            return component;
         }
         public T AddStaticComponent<T>() where T : class, IContext, IStaticComponent, new()
         {
@@ -37,14 +41,30 @@ namespace ECSLite
             }
             return component;
         }
+
+        public bool HasComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
+        {
+            var entity = entities[id.Index];
+            if (entity.ID.Version != id.Version)
+            {
+                return false;
+            }
+            if (!ComponentIdentity<T>.Unique)
+                return entity.HasComponent(ComponentIdentity<T>.Id);
+            return collectors[ComponentIdentity<T>.Id].Get(id) != null;
+        }
+
         public T GetComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
         {
             var entity = entities[id.Index];
             if (entity.ID.Version != id.Version)
             {
-                throw new Exception($"Entity已经被删除 => {id}");
+                return null;
             }
-            return collectors[ComponentIdentity<T>.Id].Get(id) as T;
+            int componentId = ComponentIdentity<T>.Id;
+            if (!ComponentIdentity<T>.Unique && !entity.HasComponent(componentId))
+                return null;
+            return collectors[componentId].Get(id) as T;
         }
         public T GetUniqueComponent<T>(out TEntity entity) where T : class, IContext, IUniqueComponent, new()
         {
@@ -68,7 +88,17 @@ namespace ECSLite
 
         public void RemoveComponent<T>(EntityIdentify id) where T : class, IContext, IComponent, new()
         {
+            var entity = entities[id.Index];
+            if (entity.ID.Version != id.Version)
+            {
+                throw new Exception($"Entity已经被删除 => {id}");
+            }
+            int componentId = ComponentIdentity<T>.Id;
+            if (!entity.HasComponent(componentId))
+                return;
             collectors[ComponentIdentity<T>.Id].Remove(id);
+            if (!ComponentIdentity<T>.Unique)
+                entity.RemoveComponent(componentId);
         }
 
         public void RemoveAll<T>() where T : class, IContext, IComponent, new()
