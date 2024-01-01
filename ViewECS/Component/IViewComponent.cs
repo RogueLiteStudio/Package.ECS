@@ -1,6 +1,9 @@
 namespace VECS
 {
-    public interface IViewComponent
+    //Context类型，主要是用来做代码生成处理兼容ECSLite
+    public interface IView { }
+
+    public interface IViewComponent : IView
     {
     }
     public class ViewComponentIdentity<T> where T : IViewComponent

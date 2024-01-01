@@ -1,6 +1,6 @@
 namespace VECS
 {
-    public interface IViewStaticComponent
+    public interface IViewStaticComponent : IView
     {
     }
     public class ViewStaticComponentIdentity<T> where T : IViewStaticComponent

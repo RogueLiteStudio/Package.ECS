@@ -1,7 +1,8 @@
 ﻿namespace ECSLite
 {
+    using Component = IComponent;
     public abstract class GroupUpdateSystemT<ContextType, IContext, TComponent> :ISystem 
-        where ContextType : ContextT<IContext>, new()
+        where ContextType : ContextT<IContext>
         where TComponent : class, IContext, IComponent, new()
     {
         public ContextType Context { get; private set; }
