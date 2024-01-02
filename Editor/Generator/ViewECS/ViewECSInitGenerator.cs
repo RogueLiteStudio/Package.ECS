@@ -10,7 +10,7 @@ namespace ECSEditor
             writer.WriteLine("//工具生成，手动修改无效");
             using (new CSharpCodeWriter.NameSpaceScop(writer, "VECS"))
             {
-                using (new CSharpCodeWriter.Scop(writer, "public class ViewECSInit"))
+                using (new CSharpCodeWriter.Scop(writer, "public class ViewECS"))
                 {
                     writer.WriteLine($"private static int s_ComponentCount = {collector.ValidCount - collector.UniqueCount};");
                     writer.WriteLine($"private static int s_UniqueComponentCount = {collector.UniqueCount};");
@@ -42,7 +42,7 @@ namespace ECSEditor
 
         private static void WriteId(CSharpCodeWriter writer, ComponentCollector collector)
         {
-            using (new CSharpCodeWriter.Scop(writer, "static ViewECSInit()"))
+            using (new CSharpCodeWriter.Scop(writer, "static ViewECS()"))
             {
 
                 for (int i = 0; i < collector.StaticTypes.Count; ++i)

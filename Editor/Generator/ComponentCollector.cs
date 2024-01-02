@@ -39,6 +39,10 @@ namespace ECSEditor
         public string ContextName {  get; private set; }
         public string NameSpace {  get; private set; }
 
+        //private Type FindType(string name)
+        //{
+        //}
+
         public void Collector(string nameSpcace, Type contextType, Type componentType = null, Type uniqueType = null, Type staticType = null)
         {
             NameSpace = nameSpcace;
@@ -52,15 +56,24 @@ namespace ECSEditor
             }
             if (componentType == null)
             {
-                componentType = Type.GetType($"{contextType.Namespace}.I{ContextName}Component");
+                if (!string.IsNullOrEmpty(contextType.Namespace))
+                    componentType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}Component");
+                else
+                    componentType = contextType.Assembly.GetType($"I{ContextName}Component");
             }
             if (uniqueType == null)
             {
-                uniqueType = Type.GetType($"{contextType.Namespace}.I{ContextName}UniqueComponent");
+                if (!string.IsNullOrEmpty(contextType.Namespace))
+                    uniqueType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}UniqueComponent");
+                else
+                    uniqueType = contextType.Assembly.GetType($"I{ContextName}UniqueComponent");
             }
             if (staticType == null)
             {
-                staticType = Type.GetType($"{contextType.Namespace}.I{ContextName}StaticComponent");
+                if (!string.IsNullOrEmpty(contextType.Namespace))
+                    staticType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}StaticComponent");
+                else
+                    staticType = contextType.Assembly.GetType($"I{ContextName}StaticComponent");
             }
             if (componentType == null)
                 return;

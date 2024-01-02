@@ -10,7 +10,7 @@ namespace ECSEditor
             writer.WriteLine("//工具生成，手动修改无效");
             using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
-                using (new CSharpCodeWriter.Scop(writer, $"public class {collector.ContextName}ECSInit"))
+                using (new CSharpCodeWriter.Scop(writer, $"public class {collector.ContextName}ECS"))
                 {
                     writer.WriteLine($"private static int s_ComponentCount = {collector.ValidCount - collector.UniqueCount};");
                     writer.WriteLine($"private static int s_UniqueComponentCount = {collector.UniqueCount};");
@@ -43,7 +43,7 @@ namespace ECSEditor
 
         private static void WriteId(CSharpCodeWriter writer, ComponentCollector collector)
         {
-            using (new CSharpCodeWriter.Scop(writer, $"static {collector.ContextName}ECSInit()"))
+            using (new CSharpCodeWriter.Scop(writer, $"static {collector.ContextName}ECS()"))
             {
 
                 for (int i = 0; i < collector.StaticTypes.Count; ++i)
@@ -60,7 +60,7 @@ namespace ECSEditor
                     if (ty.IsUnique)
                         writer.WriteLine($"ECSLite.ComponentIdentity<{ty.Type.Name}>.Unique = true;");
                 }
-                writer.WriteLine("ECSLite.ComponentClearup.Init();");
+                writer.WriteLine($"{collector.ContextName}ComponentReset.Init();");
             }
         }
     }

@@ -12,7 +12,7 @@ namespace ECSEditor
             writer.WriteLine("//工具生成，手动修改无效");
             using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
-                using (new CSharpCodeWriter.Scop(writer, $"public partial class {collector.NameSpace}ComponentReset"))
+                using (new CSharpCodeWriter.Scop(writer, $"public partial class {collector.ContextName}ComponentReset"))
                 {
                     foreach (var ty in collector.Types)
                     {
