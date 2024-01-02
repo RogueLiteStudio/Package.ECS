@@ -39,44 +39,17 @@ namespace ECSEditor
         public string ContextName {  get; private set; }
         public string NameSpace {  get; private set; }
 
-        //private Type FindType(string name)
-        //{
-        //}
-
-        public void Collector(string nameSpcace, Type contextType, Type componentType = null, Type uniqueType = null, Type staticType = null)
+        public void Collector(string nameSpcace, Type contextType, Type componentType, Type uniqueType, Type staticType)
         {
             NameSpace = nameSpcace;
             ContextType = contextType;
-            if (contextType == null)
+            if (contextType == null || componentType == null)
                 return;
             ContextName = ContextType.Name;
             if (ContextName.StartsWith('I'))
             {
                 ContextName = ContextName.Substring(1);
             }
-            if (componentType == null)
-            {
-                if (!string.IsNullOrEmpty(contextType.Namespace))
-                    componentType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}Component");
-                else
-                    componentType = contextType.Assembly.GetType($"I{ContextName}Component");
-            }
-            if (uniqueType == null)
-            {
-                if (!string.IsNullOrEmpty(contextType.Namespace))
-                    uniqueType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}UniqueComponent");
-                else
-                    uniqueType = contextType.Assembly.GetType($"I{ContextName}UniqueComponent");
-            }
-            if (staticType == null)
-            {
-                if (!string.IsNullOrEmpty(contextType.Namespace))
-                    staticType = contextType.Assembly.GetType($"{contextType.Namespace}.I{ContextName}StaticComponent");
-                else
-                    staticType = contextType.Assembly.GetType($"I{ContextName}StaticComponent");
-            }
-            if (componentType == null)
-                return;
             foreach (var assemble in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (var type in assemble.GetTypes())

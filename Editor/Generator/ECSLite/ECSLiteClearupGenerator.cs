@@ -14,7 +14,6 @@ namespace ECSEditor
                 {
                     using (new CSharpCodeWriter.Scop(writer, "public static void Init()"))
                     {
-                        writer.WriteLine("//OnReset");
                         foreach (var ty in collector.Types)
                         {
                             if (ty.ResetType == ComponentCollector.ResetType.None)

@@ -8,7 +8,7 @@ namespace ECSEditor
         {
             var writer = new CSharpCodeWriter();
             writer.WriteLine("//工具生成，手动修改无效");
-            using (new CSharpCodeWriter.NameSpaceScop(writer, "VECS"))
+            using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
                 using (new CSharpCodeWriter.Scop(writer, "public class ViewECS"))
                 {
@@ -48,16 +48,16 @@ namespace ECSEditor
                 for (int i = 0; i < collector.StaticTypes.Count; ++i)
                 {
                     var type = collector.StaticTypes[i];
-                    writer.WriteLine($"ViewStaticComponentIdentity<{type.Name}>.Id = {i};");
+                    writer.WriteLine($"VECS.ViewStaticComponentIdentity<{type.Name}>.Id = {i};");
                 }
                 int id = 0;
                 foreach (var ty in collector.Types)
                 {
                     if (ty.Type.IsAbstract)
                         continue;
-                    writer.WriteLine($"ViewComponentIdentity<{ty.Type.Name}>.Id = {id++};");
+                    writer.WriteLine($"VECS.ViewComponentIdentity<{ty.Type.Name}>.Id = {id++};");
                     if (ty.IsUnique)
-                        writer.WriteLine($"ViewComponentIdentity<{ty.Type.Name}>.Unique = true;");
+                        writer.WriteLine($"VECS.ViewComponentIdentity<{ty.Type.Name}>.Unique = true;");
                 }
                 writer.WriteLine("ViewComponentClearup.Init();");
             }

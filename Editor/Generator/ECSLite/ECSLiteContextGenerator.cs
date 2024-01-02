@@ -11,7 +11,7 @@ namespace ECSEditor
             using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
                 writer.WriteLine($"public interface I{collector.ContextName}Component : {collector.ContextType.Name}, ECSLite.IComponent{{}}");
-                writer.WriteLine($"public interface I{collector.ContextName}UniqueComponent : {collector.ContextType.Name}, ECSLite.IUniqueComponent{{}}");
+                writer.WriteLine($"public interface I{collector.ContextName}UniqueComponent : {collector.ContextType.Name}, I{collector.ContextName}Component, ECSLite.IUniqueComponent{{}}");
                 writer.WriteLine($"public interface I{collector.ContextName}StaticComponent : {collector.ContextType.Name}, ECSLite.IStaticComponent{{}}");
                 writer.NewLine();
                 using (new CSharpCodeWriter.Scop(writer, $"public class {collector.ContextName}Context : ECSLite.ContextT<{collector.ContextType.Name}>"))

@@ -9,7 +9,7 @@ namespace ECSEditor
         {
             var writer = new CSharpCodeWriter();
             writer.WriteLine("//工具生成，手动修改无效");
-            using (new CSharpCodeWriter.NameSpaceScop(writer, "VECS"))
+            using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
                 using (new CSharpCodeWriter.Scop(writer, "public partial class ViewComponentClearup"))
                 {
