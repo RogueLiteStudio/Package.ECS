@@ -14,7 +14,7 @@ namespace ECSEditor
                 writer.WriteLine($"public interface I{collector.ContextName}UniqueComponent : {collector.ContextType.Name}, ECSLite.IUniqueComponent{{}}");
                 writer.WriteLine($"public interface I{collector.ContextName}StaticComponent : {collector.ContextType.Name}, ECSLite.IStaticComponent{{}}");
                 writer.NewLine();
-                using (new CSharpCodeWriter.Scop(writer, $"public class {collector.ContextName}Context : ContextT<{collector.ContextType.Name}>"))
+                using (new CSharpCodeWriter.Scop(writer, $"public class {collector.ContextName}Context : ECSLite.ContextT<{collector.ContextType.Name}>"))
                 {
                     using (new CSharpCodeWriter.Scop(writer, $"public {collector.ContextName}Context(int componentCount, int uniqueCount, int staticComponentCount) : base(componentCount, uniqueCount, staticComponentCount)"))
                     {
