@@ -10,7 +10,7 @@ namespace ECSEditor
             writer.WriteLine("//工具生成，手动修改无效");
             using (new CSharpCodeWriter.NameSpaceScop(writer, collector.NameSpace))
             {
-                using (new CSharpCodeWriter.Scop(writer, $"public partial class {collector.ContextName}ComponentClearup"))
+                using (new CSharpCodeWriter.Scop(writer, $"public partial class {collector.ContextName}ComponentReset"))
                 {
                     using (new CSharpCodeWriter.Scop(writer, "public static void Init()"))
                     {

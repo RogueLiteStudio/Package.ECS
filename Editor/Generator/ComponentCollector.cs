@@ -39,15 +39,31 @@ namespace ECSEditor
         public string ContextName {  get; private set; }
         public string NameSpace {  get; private set; }
 
-        public void Collector<TContext, TComponent, TUniqueComponent, TStaticComponent>(string nameSpcace)
+        public void Collector(string nameSpcace, Type contextType, Type componentType = null, Type uniqueType = null, Type staticType = null)
         {
             NameSpace = nameSpcace;
-            ContextType = typeof(TContext);
+            ContextType = contextType;
+            if (contextType == null)
+                return;
             ContextName = ContextType.Name;
             if (ContextName.StartsWith('I'))
             {
                 ContextName = ContextName.Substring(1);
             }
+            if (componentType == null)
+            {
+                componentType = Type.GetType($"{contextType.Namespace}.I{ContextName}Component");
+            }
+            if (uniqueType == null)
+            {
+                uniqueType = Type.GetType($"{contextType.Namespace}.I{ContextName}UniqueComponent");
+            }
+            if (staticType == null)
+            {
+                staticType = Type.GetType($"{contextType.Namespace}.I{ContextName}StaticComponent");
+            }
+            if (componentType == null)
+                return;
             foreach (var assemble in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (var type in assemble.GetTypes())
@@ -56,22 +72,22 @@ namespace ECSEditor
                         continue;
                     if (!ContextType.IsAssignableFrom(type))
                         continue;
-                    if (typeof(TStaticComponent).IsAssignableFrom(type))
+                    if (staticType != null && staticType.IsAssignableFrom(type))
                     {
                         staticTypes.Add(type);
                         continue;
                     }
-                    if (!typeof(TComponent).IsAssignableFrom(type))
+                    if (!componentType.IsAssignableFrom(type))
                         continue;
                     var fields = type.GetFields().Where(it => it.IsPublic && !it.IsStatic);
                     ComponentType c = new ComponentType
                     {
                         Type = type,
-                        IsUnique = typeof(TUniqueComponent).IsAssignableFrom(type),
+                        IsUnique = uniqueType != null && uniqueType.IsAssignableFrom(type),
                         Name = type.Name.EndsWith(SUFFIX) ? type.Name.Substring(0, type.Name.Length - SUFFIX.Length) : type.Name,
                         Fields = fields.Where(it => it.DeclaringType == type).ToList(),
                         IsFlag = fields.Count() == 0,
-                        BaseType = typeof(TComponent).IsAssignableFrom(type.BaseType) ? type.BaseType : null,
+                        BaseType = componentType.IsAssignableFrom(type.BaseType) ? type.BaseType : null,
                     };
                     types.Add(c);
                 }

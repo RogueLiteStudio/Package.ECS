@@ -2,7 +2,7 @@
 
 namespace ECSEditor
 {
-    public static class ECSListContextGenerator
+    public static class ECSLiteContextGenerator
     {
         public static void Gen(string path, ComponentCollector collector)
         {
