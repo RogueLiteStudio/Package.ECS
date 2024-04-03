@@ -154,7 +154,7 @@ namespace ECSEditor
             return writer.ToString();
         }
 
-        public static string GenViewGroupSystem(string name, string nameSpace, bool isReactive, bool isLateUpdat)
+        public static string GenViewGroupSystem(string name, string nameSpace, bool isReactive, bool isLateUpdate)
         {
             CSharpCodeWriter writer = new CSharpCodeWriter(true);
             using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpace))
@@ -162,9 +162,9 @@ namespace ECSEditor
                 string baseClass = "GroupUpdateSystem";
                 if (isReactive)
                 {
-                    baseClass = isLateUpdat ? "ReactiveLateUpdateSystem" : "ReactiveUpdateSystem";
+                    baseClass = isLateUpdate ? "ReactiveLateUpdateSystem" : "ReactiveUpdateSystem";
                 }
-                else if (isLateUpdat)
+                else if (isLateUpdate)
                 {
                     baseClass = "GroupLateUpdateSystem";
                 }
