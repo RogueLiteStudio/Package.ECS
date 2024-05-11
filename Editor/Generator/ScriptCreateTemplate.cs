@@ -57,7 +57,7 @@ namespace ECSEditor
             CSharpCodeWriter writer = new CSharpCodeWriter(true);
             using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpece))
             {
-                writer.WriteLine($"public partial class {name} : I{contextName}Component");
+                writer.WriteLine($"public class {name} : I{contextName}Component");
                 writer.BeginScope();
                 writer.EndScope();
             }
