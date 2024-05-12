@@ -31,62 +31,12 @@ namespace ECSEditor
                                 }
                                 baseTy = baseTy.Base;
                             }
-                            WriteReset(writer, ty.Fields, customReset);
+                            GeneratorUtils.WriteReset(writer, ty.Fields, customReset);
                         }
                     }
                 }
             }
             GeneratorUtils.WriteToFile(path, writer.ToString());
         }
-
-        private static void WriteReset(CSharpCodeWriter writer, List<FieldInfo> fields, System.Func<System.Type, string, string> customReset)
-        {
-            foreach (var field in fields)
-            {
-                if (customReset != null)
-                {
-                    string v = customReset(field.FieldType, field.Name);
-                    if (!string.IsNullOrEmpty(v))
-                    {
-                        writer.WriteLine(v);
-                        continue;
-                    }
-                }
-
-                if (field.GetCustomAttribute<VECS.ResetToNullAttribute>() == null
-                    && !field.FieldType.IsSubclassOf(typeof(UnityEngine.Object)))
-                {
-                    if (WriteReset(writer, field, "Clear"))
-                        continue;
-                    if (WriteReset(writer, field, "Reset()"))
-                        continue;
-                }
-                if (field.FieldType == typeof(UnityEngine.Quaternion))
-                {
-                    writer.WriteLine($"value.{field.Name} = UnityEngine.Quaternion.identity;");
-                    continue;
-                }
-                writer.WriteLine($"value.{field.Name} = default;");
-            }
-        }
-
-        private static bool WriteReset(CSharpCodeWriter writer, FieldInfo field, string funcName)
-        {
-            var method = field.FieldType.GetMethod(funcName);
-            if (method != null && method.IsPublic && !method.IsStatic && method.GetParameters().Length == 0)
-            {
-                if (field.FieldType.IsValueType)
-                {
-                    writer.WriteLine($"value.{field.Name}.{funcName}();");
-                }
-                else
-                {
-                    writer.WriteLine($"value.{field.Name}?.{funcName}();");
-                }
-                return true;
-            }
-            return false;
-        }
-
     }
 }
