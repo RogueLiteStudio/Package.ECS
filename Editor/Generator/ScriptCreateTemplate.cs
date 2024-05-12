@@ -75,6 +75,28 @@ namespace ECSEditor
             }
             return writer.ToString();
         }
+        public static string GenStaticViewComponentClass(string name, string nameSpece)
+        {
+            CSharpCodeWriter writer = new CSharpCodeWriter(true);
+            using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpece))
+            {
+                writer.WriteLine($"public class {name} : VECS.IViewStaticComponent");
+                writer.BeginScope();
+                writer.EndScope();
+            }
+            return writer.ToString();
+        }
+        public static string GenUniqueViewComponentClass(string name, string nameSpece)
+        {
+            CSharpCodeWriter writer = new CSharpCodeWriter(true);
+            using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpece))
+            {
+                writer.WriteLine($"public class {name} : VECS.IViewUniqueComponent");
+                writer.BeginScope();
+                writer.EndScope();
+            }
+            return writer.ToString();
+        }
 
         public static string GenECSLiteSystem(string name, string nameSpace, string contextType, string baseClass, string funcName)
         {
