@@ -31,7 +31,7 @@ namespace ECSEditor
                                 var componentType = paramList[1].ParameterType;
                                 if (typeof(VECS.IViewComponent).IsAssignableFrom(componentType))
                                 {
-                                    writer.WriteLine($"ViewComponentClear<{componentType.Name}>.OnRemove = OnRemove;");
+                                    writer.WriteLine($"VECS.ViewComponentClear<{componentType.Name}>.OnRemove = OnRemove;");
                                 }
                             }
                         }
@@ -40,7 +40,7 @@ namespace ECSEditor
                         {
                             if (ty.ResetType == ComponentCollector.ResetType.None)
                                 continue;
-                            writer.WriteLine($"ViewComponentClear<{ty.Type.Name}>.OnReset = OnReset;");
+                            writer.WriteLine($"VECS.ViewComponentClear<{ty.Type.Name}>.OnReset = OnReset;");
                         }
                     }
                 }
