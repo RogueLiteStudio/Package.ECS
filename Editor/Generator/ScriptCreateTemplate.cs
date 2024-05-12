@@ -69,7 +69,7 @@ namespace ECSEditor
             CSharpCodeWriter writer = new CSharpCodeWriter(true);
             using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpece))
             {
-                writer.WriteLine($"public partial class {name} : VECS.IViewComponent");
+                writer.WriteLine($"public class {name} : VECS.IViewComponent");
                 writer.BeginScope();
                 writer.EndScope();
             }
@@ -109,7 +109,7 @@ namespace ECSEditor
             CSharpCodeWriter writer = new CSharpCodeWriter(true);
             using (new CSharpCodeWriter.NameSpaceScop(writer, nameSpace))
             {
-                using (new CSharpCodeWriter.Scop(writer, $"public class {name} : VECS.{baseClass}"))
+                using (new CSharpCodeWriter.Scop(writer, $"public class {name} : {baseClass}"))
                 {
                     writer.WriteLine("private readonly VECS.ViewContext mContext;");
                     using (new CSharpCodeWriter.Scop(writer, $"public {name}(VECS.ViewContext context)"))
@@ -119,7 +119,7 @@ namespace ECSEditor
                     using (new CSharpCodeWriter.Scop(writer, $"public void {funcName}()"))
                     {
                         writer.WriteLine("/*");
-                        writer.WriteLine("var group = mContext.CreatGroup<VECS.IViewComponent>();");
+                        writer.WriteLine("var group = mContext.CreatGroup<IViewComponent>();");
                         writer.WriteLine("while (group.MoveNext())");
                         using (new CSharpCodeWriter.Scop(writer))
                         {

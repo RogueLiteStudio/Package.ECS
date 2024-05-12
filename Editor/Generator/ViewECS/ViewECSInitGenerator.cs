@@ -19,9 +19,9 @@ namespace ECSEditor
                     writer.WriteLine("public static int StaticComponentCount => s_StatcicComponentCount;");
 
                     WriteId(writer, collector);
-                    using (new CSharpCodeWriter.Scop(writer, "public static ViewContext CreateContext()"))
+                    using (new CSharpCodeWriter.Scop(writer, "public static VECS.ViewContext CreateContext()"))
                     {
-                        writer.WriteLine("ViewContext context = new ViewContext(s_ComponentCount, s_UniqueComponentCount, s_StatcicComponentCount);");
+                        writer.WriteLine("VECS.ViewContext context = new VECS.ViewContext(s_ComponentCount, s_UniqueComponentCount, s_StatcicComponentCount);");
                         foreach (var ty in collector.Types)
                         {
                             if (ty.Type.IsAbstract)
