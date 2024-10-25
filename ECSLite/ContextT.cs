@@ -64,9 +64,19 @@ namespace ECSLite
             AddToAll<T>();
         }
 
-        public EntityFindResult<IContext, T> Find<T>(int startIndex, Func<T, bool> condition = null) where T: class, IContext, IComponent, new ()
+        public EntityFindResult<IContext, T> Find<T>(int startIndex) where T: class, IContext, IComponent, new ()
         {
-            var result =FindComponet(startIndex, condition);
+            var result =FindComponet<T>(startIndex);
+            return new EntityFindResult<IContext, T>
+            {
+                Component = result.Component,
+                Entity = IndexToEntity(result.EntityIndex),
+                Index = result.Index,
+            };
+        }
+        public EntityFindResult<IContext, T> MatchFind<T, TMatcher>(int startIndex, TMatcher matcher) where T : class, IContext, IComponent, new() where TMatcher : IComponentMatcher<T>
+        {
+            var result = MatchFindComponet<T, TMatcher>(startIndex, matcher);
             return new EntityFindResult<IContext, T>
             {
                 Component = result.Component,
@@ -75,9 +85,18 @@ namespace ECSLite
             };
         }
 
-        public Group<IContext, T> CreateGroup<T>(Func<T, bool> condition = null) where T : class, IContext, IComponent, new()
+        public Group<IContext, T> CreateGroup<T>() where T : class, IContext, IComponent, new()
         {
-            return new Group<IContext, T>(this, condition);
+            return new Group<IContext, T>(this);
+        }
+
+        public MatchGroup<IContext, T, TMatcher> CreateMatchGroup<T, TMatcher>(TMatcher matcher) where T : class, IContext, IComponent, new() where TMatcher : IComponentMatcher<T>
+        {
+            return new MatchGroup<IContext, T, TMatcher>(this, matcher);
+        }
+        public MatchGroup<IContext, T, TMatcher> CreateMatchGroup<T, TMatcher>() where T : class, IContext, IComponent, new() where TMatcher : IComponentMatcher<T>, new()
+        {
+            return new MatchGroup<IContext, T, TMatcher>(this, new TMatcher());
         }
     }
 }

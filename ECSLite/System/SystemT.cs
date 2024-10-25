@@ -10,9 +10,9 @@
             Context = context;
         }
 
-        public Group<IContext, T> CreateGroup<T>(System.Func<T, bool> condition) where T : class, IContext, IComponent, new()
+        public Group<IContext, T> CreateGroup<T>() where T : class, IContext, IComponent, new()
         {
-            return Context.CreateGroup(condition);
+            return Context.CreateGroup<T>();
         }
     }
 }

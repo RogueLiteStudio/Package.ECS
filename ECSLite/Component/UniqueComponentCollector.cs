@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ECSLite
+﻿namespace ECSLite
 {
     internal class UniqueComponentCollector<T> : IComponentCollectorT<T> where T : class, IUniqueComponent, new()
     {
@@ -28,12 +26,11 @@ namespace ECSLite
             return Component.Component;
         }
 
-        public ComponentFindResult<T> Find(int startIndex, Func<T, bool> condition = null)
+        public ComponentFindResult<T> Find(int startIndex)
         {
-            var result = new ComponentFindResult<T>();
+            var result = new ComponentFindResult<T>() { Index = 1};
             if (startIndex == 0
-                && Component.EntityIdx >= 0 
-                && (condition == null || condition(Component.Component)))
+                && Component.EntityIdx >= 0 )
             {
                 result.Component = Component.Component;
                 result.Index = 1;
@@ -42,6 +39,19 @@ namespace ECSLite
             return result;
         }
 
+        public ComponentFindResult<T> MatchFind<TMatcher>(int startIndex, TMatcher matcher) where TMatcher : IComponentMatcher<T>
+        {
+            var result = new ComponentFindResult<T>() { Index = 1 };
+            if (startIndex == 0
+                && Component.EntityIdx >= 0
+                && matcher.Match(Component.Component))
+            {
+                result.Component = Component.Component;
+                result.Index = 1;
+                result.EntityIndex = Component.EntityIdx;
+            }
+            return result;
+        }
         public IComponent Get(int entityIdx)
         {
             if (entityIdx == Component.EntityIdx)

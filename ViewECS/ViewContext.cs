@@ -190,11 +190,11 @@ namespace VECS
             }
         }
 
-        public EntityFindResult<T> Find<T>(int startIndex, ulong version, bool includeDisable = false, System.Func<T, bool> condition = null, int groupIndex = -1) where T : class, IViewComponent, new()
+        public EntityFindResult<T> Find<T>(int startIndex, ulong version, bool includeDisable = false, int groupIndex = -1) where T : class, IViewComponent, new()
         {
             int id = ViewComponentIdentity<T>.Id;
             var collector = collectors[id] as IComponentCollectorT<T>;
-            var result = collector.Find(startIndex, version, includeDisable, condition);
+            var result = collector.Find(startIndex, version, includeDisable);
             if (groupIndex >= 0)
             {
                 if (groups[groupIndex] < result.Version)
@@ -202,9 +202,29 @@ namespace VECS
             }
             return result;
         }
-        public Group<TComponent> CreatGroup<TComponent>(bool includeDisable = false, System.Func<TComponent, bool> condition = null) where TComponent : class, IViewComponent, new()
+
+        public EntityFindResult<T> MatchFind<T, TMatcher>(TMatcher matcher, int startIndex, ulong version, bool includeDisable = false, int groupIndex = -1) where T : class, IViewComponent, new()
+            where TMatcher : IViewComponentMatcher<T>
         {
-            return new Group<TComponent>(this, includeDisable, condition);
+            int id = ViewComponentIdentity<T>.Id;
+            var collector = collectors[id] as IComponentCollectorT<T>;
+            var result = collector.MatchFind(startIndex, version, includeDisable, matcher);
+            if (groupIndex >= 0)
+            {
+                if (groups[groupIndex] < result.Version)
+                    groups[groupIndex] = result.Version;
+            }
+            return result;
+        }
+
+        public Group<TComponent> CreatGroup<TComponent>(bool includeDisable = false) where TComponent : class, IViewComponent, new()
+        {
+            return new Group<TComponent>(this, includeDisable);
+        }
+
+        public MatchGroup<TComponent, TMatcher> CreatMatchGroup<TComponent, TMatcher>(TMatcher matcher, bool includeDisable = false) where TComponent : class, IViewComponent, new() where TMatcher : IViewComponentMatcher<TComponent>
+        {
+            return new MatchGroup<TComponent, TMatcher>(this, matcher, includeDisable);
         }
 
         public int RegisterReactiveGroup<T>() where T : class, IViewComponent, new()

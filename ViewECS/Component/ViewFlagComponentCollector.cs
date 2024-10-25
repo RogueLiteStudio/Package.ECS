@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 namespace VECS
 {
@@ -82,7 +81,7 @@ namespace VECS
             }
             mIdIdxMap.Clear();
         }
-        public EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable, Func<T, bool> condition = null)
+        public EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable)
         {
             if (mVersion > version)
             {
@@ -105,7 +104,33 @@ namespace VECS
                     }
                 }
             }
-            return new EntityFindResult<T>();
+            return new EntityFindResult<T>() { Index = mUnits.Count };
+        }
+
+        public EntityFindResult<T> MatchFind<TMatcher>(int startIndex, ulong version, bool includeDisable, TMatcher matcher) where TMatcher : IViewComponentMatcher<T>
+        {
+            if (mVersion > version)
+            {
+                for (int i = startIndex; i < mUnits.Count; ++i)
+                {
+                    var unit = mUnits[i];
+                    if (unit.Owner == null)
+                        continue;
+                    if (!includeDisable && unit.Owner.State != ViewEntityInternal.EntityState.Loaded)
+                        continue;
+                    if (unit.Version > version && matcher.Match(unit.Owner.ToEntity(), Component))
+                    {
+                        return new EntityFindResult<T>()
+                        {
+                            Entity = unit.Owner.ToEntity(),
+                            Index = i + 1,
+                            Version = unit.Version,
+                            Component = Component
+                        };
+                    }
+                }
+            }
+            return new EntityFindResult<T>() { Index = mUnits.Count };
         }
     }
 }

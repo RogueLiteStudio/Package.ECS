@@ -1,4 +1,3 @@
-using System;
 namespace VECS
 {
     public struct EntityFindResult<TComponent> where TComponent : IViewComponent
@@ -12,28 +11,26 @@ namespace VECS
     public struct Group<TComponent> where TComponent : class, IViewComponent, new()
     {
         private readonly ViewContext Context;
-        private readonly Func<TComponent, bool> Condition;
+        private EntityFindResult<TComponent> Result;
         private readonly bool InCludeDisable;
-        private int Index;
-        public ViewEntity Entity;
-        public TComponent Component;
-        public Group(ViewContext context, bool inCludeDisable, Func<TComponent, bool> condition)
+        public readonly ViewEntity Entity=>Result.Entity;
+        public readonly TComponent Component=>Result.Component;
+        public Group(ViewContext context, bool inCludeDisable)
         {
-            Index = 0;
+            Result = new EntityFindResult<TComponent>();
             InCludeDisable = inCludeDisable;
             Context = context;
-            Condition = condition;
-            Entity = default;
-            Component = default;
         }
 
         public bool MoveNext()
         {
-            var result = Context.Find(Index, 0, InCludeDisable, Condition);
-            Component = result.Component;
-            Entity = result.Entity;
-            Index = result.Index;
-            return Entity != null;
+            Result = Context.Find<TComponent>(Result.Index, 0, InCludeDisable);
+            return Result.Entity != null;
+        }
+
+        public void Reset()
+        {
+            Result = new EntityFindResult<TComponent>();
         }
     }
 

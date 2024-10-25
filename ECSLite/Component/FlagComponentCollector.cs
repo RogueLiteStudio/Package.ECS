@@ -36,7 +36,7 @@ namespace ECSLite
             return Component;
         }
 
-        public ComponentFindResult<T> Find(int startIndex, Func<T, bool> condition = null)
+        public ComponentFindResult<T> Find(int startIndex)
         {
             for (int i = startIndex; i < mUnits.Count; ++i)
             {
@@ -50,9 +50,25 @@ namespace ECSLite
                     Component = Component
                 };
             }
-            return default;
+            return new ComponentFindResult<T>(){ Index = mUnits.Count};
         }
 
+        public ComponentFindResult<T> MatchFind<TMatcher>(int startIndex, TMatcher matcher) where TMatcher : IComponentMatcher<T>
+        {
+            for (int i = startIndex; i < mUnits.Count; ++i)
+            {
+                var unit = mUnits[i];
+                if (unit.EntityIdx < 0)
+                    continue;
+                return new ComponentFindResult<T>()
+                {
+                    EntityIndex = unit.EntityIdx,
+                    Index = i + 1,
+                    Component = Component
+                };
+            }
+            return new ComponentFindResult<T>() { Index = mUnits.Count };
+        }
         public IComponent Get(int entityIdx)
         {
             if (mIdIdxMap.ContainsKey(entityIdx))
@@ -83,5 +99,6 @@ namespace ECSLite
             }
             mIdIdxMap.Clear();
         }
+
     }
 }

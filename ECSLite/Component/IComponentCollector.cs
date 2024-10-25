@@ -10,7 +10,8 @@ namespace ECSLite
     }
     internal interface IComponentCollectorT<T> : IComponentCollector where T : class, IComponent, new()
     {
-        ComponentFindResult<T> Find(int startIndex, System.Func<T, bool> condition = null);
+        ComponentFindResult<T> Find(int startIndex);
+        ComponentFindResult<T> MatchFind<TMatcher>(int startIndex, TMatcher matcher) where TMatcher : IComponentMatcher<T>;
     }
 
 }

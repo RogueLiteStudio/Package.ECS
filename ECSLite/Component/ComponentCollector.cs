@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ECSLite
 {
@@ -35,14 +34,31 @@ namespace ECSLite
             return unit.Component;
         }
 
-        public ComponentFindResult<T> Find(int startIndex, Func<T, bool> condition = null)
+        public ComponentFindResult<T> Find(int startIndex)
         {
             for (int i = startIndex; i < mUnits.Count; ++i)
             {
                 var unit = mUnits[i];
                 if (unit.EntityIdx < 0)
                     continue;
-                if (condition == null || condition(unit.Component))
+                return new ComponentFindResult<T>()
+                {
+                    EntityIndex = unit.EntityIdx,
+                    Index = i + 1,
+                    Component = unit.Component
+                };
+            }
+            return new ComponentFindResult<T>(){ Index = mUnits.Count };
+        }
+
+        public ComponentFindResult<T> MatchFind<TMatcher>(int startIndex, TMatcher matcher) where TMatcher : IComponentMatcher<T>
+        {
+            for (int i = startIndex; i < mUnits.Count; ++i)
+            {
+                var unit = mUnits[i];
+                if (unit.EntityIdx < 0)
+                    continue;
+                if (matcher.Match(unit.Component))
                 {
                     return new ComponentFindResult<T>()
                     {
@@ -52,7 +68,7 @@ namespace ECSLite
                     };
                 }
             }
-            return default;
+            return new ComponentFindResult<T>() { Index = mUnits.Count };
         }
 
         public IComponent Get(int entityIdx)
@@ -85,5 +101,6 @@ namespace ECSLite
             }
             mIdIdxMap.Clear();
         }
+
     }
 }

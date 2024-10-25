@@ -4,7 +4,7 @@ namespace VECS
     internal class ViewUniqueComponentCollector<T> : IComponentCollectorT<T> where T : class, IViewUniqueComponent, new()
     {
         public int Count => Component.Owner != null ? 1 : 0;
-        private ComponentEntity<T> Component = new ComponentEntity<T>();
+        private readonly ComponentEntity<T> Component = new ComponentEntity<T>();
         private readonly Action<ViewEntity, T> onRemove = ViewComponentClear<T>.OnRemove;
         public IViewComponent Add(ViewEntityInternal entity, ulong version, bool forceModify)
         {
@@ -23,13 +23,13 @@ namespace VECS
             return Component.Component;
         }
 
-        public EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable, Func<T, bool> condition = null)
+        public EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable)
         {
-            var result = new EntityFindResult<T>();
+            var result = new EntityFindResult<T>() { Index = 1};
             if (startIndex == 0 
                 && Component.Owner != null 
                 && (Component.Owner.State == ViewEntityInternal.EntityState.Loaded || includeDisable)
-                && version < Component.Version && (condition == null || condition(Component.Component)))
+                && version < Component.Version)
             {
                 result.Component = Component.Component;
                 result.Version = Component.Version;
@@ -39,6 +39,22 @@ namespace VECS
             return result;
         }
 
+        public EntityFindResult<T> MatchFind<TMatcher>(int startIndex, ulong version, bool includeDisable, TMatcher matcher) where TMatcher : IViewComponentMatcher<T>
+        {
+            var result = new EntityFindResult<T>() { Index = 1 };
+            if (startIndex == 0
+                && Component.Owner != null
+                && (Component.Owner.State == ViewEntityInternal.EntityState.Loaded || includeDisable)
+                && version < Component.Version
+                && matcher.Match(Component.Owner.ToEntity(), Component.Component))
+            {
+                result.Component = Component.Component;
+                result.Version = Component.Version;
+                result.Index = 1;
+                result.Entity = Component.Owner.ToEntity();
+            }
+            return result;
+        }
         public IViewComponent Get(ViewEntityInternal entity)
         {
             if (entity == Component.Owner)
@@ -84,5 +100,6 @@ namespace VECS
                 Component.Reset();
             }
         }
+
     }
 }

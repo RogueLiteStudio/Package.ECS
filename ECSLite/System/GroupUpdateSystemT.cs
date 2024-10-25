@@ -1,6 +1,5 @@
 ﻿namespace ECSLite
 {
-    using Component = IComponent;
     public abstract class GroupUpdateSystemT<ContextType, IContext, TComponent> :ISystem 
         where ContextType : ContextT<IContext>
         where TComponent : class, IContext, IComponent, new()
@@ -14,7 +13,7 @@
         public void OnUpdate()
         {
             OnStartUpdate();
-            var group = Context.CreateGroup<TComponent>(null);
+            var group = Context.CreateGroup<TComponent>();
             while (group.MoveNext())
             {
                 var entity = group.Entity;

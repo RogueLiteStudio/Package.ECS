@@ -157,11 +157,18 @@ namespace ECSLite
             }
         }
 
-        internal ComponentFindResult<T> FindComponet<T>(int startIndex, System.Func<T, bool> condition = null) where T : class, IComponent, new()
+        internal ComponentFindResult<T> FindComponet<T>(int startIndex) where T : class, IComponent, new()
         {
             int id = ComponentIdentity<T>.Id;
             var collector = collectors[id] as IComponentCollectorT<T>;
-            return collector.Find(startIndex, condition);
+            return collector.Find(startIndex);
+        }
+
+        internal ComponentFindResult<T> MatchFindComponet<T, TMatcher>(int startIndex, TMatcher matcher) where T : class, IComponent, new() where TMatcher : IComponentMatcher<T>
+        {
+            int id = ComponentIdentity<T>.Id;
+            var collector = collectors[id] as IComponentCollectorT<T>;
+            return collector.MatchFind(startIndex, matcher);
         }
 
         internal void RemoveAll<T>() where T : class, IComponent, new()

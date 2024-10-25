@@ -11,7 +11,8 @@
     }
     internal interface IComponentCollectorT<T> : IViewComponentCollector where T : class, IViewComponent, new()
     {
-        EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable, System.Func<T, bool> condition = null);
+        EntityFindResult<T> Find(int startIndex, ulong version, bool includeDisable);
+        EntityFindResult<T> MatchFind<TMatcher>(int startIndex, ulong version, bool includeDisable, TMatcher matcher) where TMatcher : IViewComponentMatcher<T>;
     }
     internal class ComponentEntity<T> where T : class, IViewComponent, new()
     {
